@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Andrés Mañas Mañas" />
+  <meta name="dcterms.date" content="2019-06-24" />
+  <title>Notas sobre pronóstico del flujo de tráfico en la ciudad de Madrid</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="tff-presentation_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+
+<link rel="stylesheet" href="tff-presentation_files/reveal.js-3.3.0.1/css/theme/black.css" id="theme">
+
+<style type="text/css">
+.reveal section img {
+  background: rgba(255, 255, 255, 0.85);
+}
+</style>
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+    <link rel="stylesheet" href="styles.css"/>
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+    <link href="tff-presentation_files/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+    <link href="tff-presentation_files/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+    <script src="tff-presentation_files/kePrint-0.0.1/kePrint.js"></script>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section>
+    <h1 class="title">Notas sobre pronóstico del flujo de tráfico en la ciudad de Madrid</h1>
+    <h2 class="author">Andrés Mañas Mañas</h2>
+    <h3 class="date">2019-06-24</h3>
+</section>
+
+<section><section id="introduccion" class="titleslide slide level1"><h1>Introducción</h1></section><section id="objetivos" class="slide level2">
+<h1>Objetivos</h1>
+<ul>
+<li>recopilar datos de tráfico en Madrid</li>
+<li>determinar propiedad objetivo</li>
+<li>pronóstico con métodos clásicos</li>
+<li>pronóstico con métodos basados en aprendizaje profundo</li>
+</ul>
+</section></section>
+<section><section id="datos" class="titleslide slide level1"><h1>Datos</h1></section><section id="dos-conjuntos" class="slide level2">
+<h1>Dos conjuntos</h1>
+<ul>
+<li>ubicación de los dispositivos de medida</li>
+<li>histórico de datos del tráfico desde 2013</li>
+</ul>
+<p><br/> <br/></p>
+<p><small> DIRECCIÓN GENERAL DE GESTIÓN Y VIGILANCIA DE LA CIRCULACION<br />
+SUBDIRECCIÓN GENERAL DE REGULACIÓN DE LA CIRCULACION Y DEL SERVICIO DEL TAXI<br />
+DEPARTAMENTO TECNOLOGÍAS DEL TRÁFICO<br />
+ÁREA DE GOBIERNO DE MODIO AMBIENTE Y MOVILIDAD<br />
+AYUNTAMIENTO DE MADRID </small></p>
+</section><section id="datos-de-localizacion" class="slide level2">
+<h1>Datos de localización</h1>
+<ul>
+<li>14 archivos publicados irregularmente en el tiempo</li>
+<li>tipos de dispositivo: M30 o URB</li>
+<li>98,5% de dispositivos no cambian de localización</li>
+<li>el resto los descartamos del estudio</li>
+</ul>
+<p><br/></p>
+<table class="table" style="font-size: 16px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+tipo_elem
+</th>
+<th style="text-align:right;">
+id
+</th>
+<th style="text-align:left;">
+cod_cent
+</th>
+<th style="text-align:left;">
+nombre
+</th>
+<th style="text-align:right;">
+x
+</th>
+<th style="text-align:right;">
+y
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+3840
+</td>
+<td style="text-align:left;">
+01001
+</td>
+<td style="text-align:left;">
+Jose Ortega y Gasset E-O - Pº Castellana-Serrano
+</td>
+<td style="text-align:right;">
+441615.3
+</td>
+<td style="text-align:right;">
+4475768
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+3841
+</td>
+<td style="text-align:left;">
+01002
+</td>
+<td style="text-align:left;">
+Jose Ortega y Gasset O-E - Serrano-Pº Castellana
+</td>
+<td style="text-align:right;">
+441705.9
+</td>
+<td style="text-align:right;">
+4475770
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+3842
+</td>
+<td style="text-align:left;">
+01003
+</td>
+<td style="text-align:left;">
+Pº Recoletos N-S - Almirante-Prim
+</td>
+<td style="text-align:right;">
+441319.4
+</td>
+<td style="text-align:right;">
+4474841
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+3843
+</td>
+<td style="text-align:left;">
+01004
+</td>
+<td style="text-align:left;">
+Pº Recoletos S-N - Pl, Cibeles- Recoletos
+</td>
+<td style="text-align:right;">
+441301.6
+</td>
+<td style="text-align:right;">
+4474764
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+3844
+</td>
+<td style="text-align:left;">
+01005
+</td>
+<td style="text-align:left;">
+(AFOROS) Pº Castellana S-N - Eduardo Dato - Pl,Emilio Castelar
+</td>
+<td style="text-align:right;">
+441605.8
+</td>
+<td style="text-align:right;">
+4476132
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+3845
+</td>
+<td style="text-align:left;">
+01006
+</td>
+<td style="text-align:left;">
+Pº Recoletos S-N - Villanueva-Jorge Juan
+</td>
+<td style="text-align:right;">
+441383.0
+</td>
+<td style="text-align:right;">
+4474994
+</td>
+</tr>
+</tbody>
+</table>
+</section><section id="ubicacion-geografica" class="slide level2">
+<h1>Ubicación geográfica</h1>
+<p><img src="images/locations_2018_09.jpg" width="1581" /></p>
+</section><section id="datos-de-medidas" class="slide level2">
+<h1>Datos de medidas</h1>
+<ul>
+<li>58 archivos publicados mensualmente</li>
+<li>100 MB / fichero aprox. (zip)</li>
+<li>800 MB / fichero aprox. (no zip)</li>
+<li>enero 2015 a octubre 2018</li>
+<li>4.500 dispositivos aprox.</li>
+</ul>
+<p><br/></p>
+<table class="table" style="font-size: 16px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+id
+</th>
+<th style="text-align:left;">
+fecha
+</th>
+<th style="text-align:left;">
+tipo_elem
+</th>
+<th style="text-align:right;">
+intensidad
+</th>
+<th style="text-align:right;">
+ocupacion
+</th>
+<th style="text-align:right;">
+carga
+</th>
+<th style="text-align:right;">
+vmed
+</th>
+<th style="text-align:left;">
+error
+</th>
+<th style="text-align:right;">
+periodo_integracion
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:00:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+134
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:15:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+122
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:30:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+99
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:45:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+111
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 01:00:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+119
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 01:15:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+85
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+</tbody>
+</table>
+</section><section id="propiedades-importantes" class="slide level2">
+<h1>Propiedades importantes</h1>
+<ul>
+<li>intensidad: uso de la vía (vehículos/hora)</li>
+<li>ocupación: tiempo de ocupación de la vía (%)</li>
+<li>carga: f(intensidad, ocupación y capacidad) (%)</li>
+</ul>
+<p><br/></p>
+<table class="table" style="font-size: 16px; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:right;">
+id
+</th>
+<th style="text-align:left;">
+fecha
+</th>
+<th style="text-align:left;">
+tipo_elem
+</th>
+<th style="text-align:right;">
+intensidad
+</th>
+<th style="text-align:right;">
+ocupacion
+</th>
+<th style="text-align:right;">
+carga
+</th>
+<th style="text-align:right;">
+vmed
+</th>
+<th style="text-align:left;">
+error
+</th>
+<th style="text-align:right;">
+periodo_integracion
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:00:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+134
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:15:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+122
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:30:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+99
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 00:45:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+111
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 01:00:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+119
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+4001
+</td>
+<td style="text-align:left;">
+2018-09-01 01:15:00
+</td>
+<td style="text-align:left;">
+URB
+</td>
+<td style="text-align:right;">
+85
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+NaN
+</td>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:right;">
+15
+</td>
+</tr>
+</tbody>
+</table>
+</section><section id="objetivo-carga" class="slide level2">
+<h1>Objetivo: carga</h1>
+<ul>
+<li>significativa en sí mismo del estado de la vía</li>
+<li>fácilmente interpretable (%)</li>
+<li>informado en todos los dispositivos (no sólo M30, como vmed)</li>
+<li>fallas en los datos equivalente a otras propiedades
+<ul>
+<li>intensidad: 4% errores</li>
+<li>ocupación: 8% errores</li>
+<li>carga: 5% errores</li>
+</ul></li>
+</ul>
+</section><section id="ejemplo" class="slide level2">
+<h1>Ejemplo</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-5-1.png" /><!-- --></p>
+</section></section>
+<section><section id="metodologia" class="titleslide slide level1"><h1>Metodología</h1></section><section id="etapas" class="slide level2">
+<h1>Etapas</h1>
+<ul>
+<li>revisión bibliográfica
+<ul>
+<li>Rob J. Hyndman - modelos clásicos</li>
+<li>Christopher Olah - redes neuronales</li>
+<li>…</li>
+</ul></li>
+<li>preparación de datos
+<ul>
+<li>comprensión y saneado</li>
+<li>aprovisionamiento en BBDD</li>
+<li>programación de funciones de utilidad</li>
+</ul></li>
+</ul>
+</section><section id="etapas-cont.-1" class="slide level2">
+<h1>Etapas (cont. 1)</h1>
+<ul>
+<li>selección de modelos
+<ul>
+<li>prototipado con combinaciones de parámetros, metaparámetros y arquitecturas</li>
+<li>combinaciones de estacionalidad</li>
+<li>agrupados por familia</li>
+</ul></li>
+<li>técnica de backtesting
+<ul>
+<li>instante aleatorio para cada serie</li>
+<li>todos los modelos pronostican en el mismo punto</li>
+<li>registro exhaustivo de las realizaciones de todos los experimentos</li>
+</ul></li>
+</ul>
+</section><section id="etapas-cont.-2" class="slide level2">
+<h1>Etapas (cont. 2)</h1>
+<ul>
+<li>análisis de resultados
+<ul>
+<li>selección del mejor modelo por familia</li>
+<li>selección del mejor modelo intra familias</li>
+<li>segmentando por series con mejor calidad de datos</li>
+</ul></li>
+<li>interpretación/explicación de los resultados</li>
+</ul>
+</section></section>
+<section><section id="modelos" class="titleslide slide level1"><h1>Modelos</h1></section><section id="familia-stl" class="slide level2">
+<h1>Familia STL</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-6-1.png" /><!-- --></p>
+</section><section id="familia-mstl" class="slide level2">
+<h1>Familia MSTL</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-7-1.png" /><!-- --></p>
+</section><section id="pronostico-stl-y-mstl" class="slide level2">
+<h1>Pronóstico STL y MSTL</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-8-1.png" /><!-- --></p>
+</section><section id="familia-arima" class="slide level2">
+<h1>Familia ARIMA</h1>
+<ul>
+<li>ARIMA(p,d,q)
+<ul>
+<li>AR: <span class="math inline">\(y_{t} = c + \phi_{1}y_{t-1} + \dots + \phi_{p}y_{t-p} + \varepsilon_{t}\)</span></li>
+<li>I: orden de diferenciación (serie estacionaria)</li>
+<li>MA: <span class="math inline">\(y_{t} = c + \theta_{1}\varepsilon_{t-1} + \dots + \theta_{q}\varepsilon_{t-q} + \varepsilon_t\)</span></li>
+</ul></li>
+<li>SARIMA(p,d,q,P,D,Q)<span class="math inline">\(_n\)</span>
+<ul>
+<li>ARIMA que incluye modelado de la componente estacional</li>
+</ul></li>
+<li>forecast::auto.arima()</li>
+</ul>
+</section><section id="pronostico-sarima" class="slide level2">
+<h1>Pronóstico (S)ARIMA</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-9-1.png" /><!-- --></p>
+</section><section id="familia-lstm" class="slide level2">
+<h1>Familia LSTM</h1>
+<!-- https://cdn-images-1.medium.com/max/800/1*laH0_xXEkFE0lKJu54gkFQ.png -->
+<p><img src="images/lstm.png" width="331" /></p>
+</section><section id="pronostico-lstm" class="slide level2">
+<h1>Pronóstico LSTM</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-11-1.png" /><!-- --></p>
+</section><section id="familia-mixta" class="slide level2">
+<h1>Familia Mixta</h1>
+<p>Se han diseñado variantes de modelos mixtos:</p>
+<ul>
+<li>ajustando primero un modelo STL a la serie</li>
+<li>ajustando después un modelo LSTM a los residuos del modelo anterior</li>
+</ul>
+</section><section id="pronostico-mixto" class="slide level2">
+<h1>Pronóstico Mixto</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-12-1.png" /><!-- --></p>
+</section><section id="modelos-probados" class="slide level2">
+<h1>Modelos probados</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Familia</th>
+<th>Modelos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>STL</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td>MSTL</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>ARIMA</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>LSTM</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>LSTM Exógeno</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td>Mixto STL + LSTM</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Todos los modelos se han probado en todas las series, constituyendo:</p>
+<ul>
+<li>96.103 experimentos</li>
+<li>2.126 horas de computación</li>
+</ul>
+</section></section>
+<section><section id="resultados" class="titleslide slide level1"><h1>Resultados</h1></section><section id="mejor-por-familia" class="slide level2">
+<h1>Mejor por familia</h1>
+<table>
+<thead>
+<tr class="header">
+<th>Familia</th>
+<th>Modelo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>STL</td>
+<td>STL W Reciente</td>
+</tr>
+<tr class="even">
+<td>MSTL</td>
+<td>STLM DWM Reciente</td>
+</tr>
+<tr class="odd">
+<td>ARIMA</td>
+<td>SARIMA</td>
+</tr>
+<tr class="even">
+<td>LSTM</td>
+<td>LSTM Agg4 Scale SD</td>
+</tr>
+<tr class="odd">
+<td>LSTM Exógeno</td>
+<td>LSTM-Exo DH Raw Scale Mean</td>
+</tr>
+<tr class="even">
+<td>Mixto STL + LSTM</td>
+<td>STL+LSTM Agg5 Scale Mean</td>
+</tr>
+</tbody>
+</table>
+</section><section id="rmse" class="slide level2">
+<h1>RMSE</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-14-1.png" /><!-- --></p>
+</section><section id="rmse-5-gaps" class="slide level2">
+<h1>RMSE 5% gaps</h1>
+<p><img src="tff-presentation_files/figure-revealjs/unnamed-chunk-15-1.png" /><!-- --></p>
+</section></section>
+<section><section id="conclusiones" class="titleslide slide level1"><h1>Conclusiones</h1></section><section id="objetivos-cumplidos" class="slide level2">
+<h1>Objetivos cumplidos</h1>
+<ul>
+<li>datos recopilados</li>
+<li>comprendidos</li>
+<li>pronósticos con modelos paramétricos y no paramétricos
+<ul>
+<li>STL y STLM pronostican mejor a muy corto plazo (&lt; 6h)</li>
+<li>LSTM iguala e incluso supera a corto plazo (&lt; 48h)</li>
+<li>mayor importancia de la parte reciente de la serie</li>
+</ul></li>
+</ul>
+</section><section id="trabajo-futuro" class="slide level2">
+<h1>Trabajo futuro</h1>
+<ul>
+<li>profundizar en las capacidades LSTM</li>
+<li>explorar:
+<ul>
+<li>arquitecturas
+<ul>
+<li>modelos de entrada múltiple</li>
+<li>variables exógenas</li>
+</ul></li>
+<li>agregaciones de los datos</li>
+<li>experimentar reduciendo la ventana “train”</li>
+<li>incorporar la componente espacial al modelo</li>
+<li>modelo único en infraestructura Big Data</li>
+<li>etc.</li>
+</ul></li>
+</ul>
+</section><section id="recomendaciones" class="slide level2">
+<h1>Recomendaciones</h1>
+<ul>
+<li>muestra estratificada de series</li>
+<li>descarte de series con fallas excesivas</li>
+<li>series de laboratorio (sobre todo para LSTM)</li>
+</ul>
+</section><section id="continuidad" class="slide level2">
+<h1>Continuidad</h1>
+<ul>
+<li>datos en AWS (S3)</li>
+<li>código en Github - <span class="citation" data-cites="amanas">@amanas</span>
+<ul>
+<li>4 repos (utilidades, libro, wip y presentación)</li>
+<li>2.000+ lineas de código de utilidad</li>
+<li>280+ commits</li>
+</ul></li>
+</ul>
+</section></section>
+<section><section id="section" class="titleslide slide level1"><h1>?</h1></section></section>
+<section><section id="gracias" class="titleslide slide level1"><h1>Gracias</h1></section></section>
+    </div>
+  </div>
+
+  <script src="tff-presentation_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="tff-presentation_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: true,
+        // Opens links in an iframe preview overlay
+        previewLinks: true,
+        // Transition style
+        transition: 'convex', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'convex', // none/fade/slide/convex/concave/zoom
+
+        menu: {
+          numbers: true,
+          custom: false,
+          themes: false,
+          transitions: false
+        },
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'tff-presentation_files/reveal.js-3.3.0.1/plugin/notes/notes.js', async: true },
+          { src: 'tff-presentation_files/reveal.js-3.3.0.1/plugin/menu/menu.js', async: true },
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "tff-presentation_files/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>

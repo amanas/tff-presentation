@@ -1,0 +1,18 @@
+body {
+    background-image: url(images/logo_uned.gif);
+    background-size: 90px 90px;
+    background-repeat: no-repeat;
+    background-position: left 20px bottom 20px;
+}
+
+.reveal .slide-menu-button {
+  position: fixed;
+  left: 20px;
+  top:  20px;
+  z-index: 30;
+  font-size: 24px;
+}
+
+.no-border table, .no-border table th, .no-border table td {
+   border: 0;
+}
